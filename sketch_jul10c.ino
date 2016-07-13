@@ -166,7 +166,7 @@ void setup()
   display.display(); 
   delay(250);           
   dps.begin();                  // Инициализация барометра и термометра
-  
+  loadSettings();
   setSyncProvider(RTC.get);     // Устанавливаем RTC как источник времени
   display.fillRect(0,LCDHEIGHT-10,80,9,BLACK);
   display.display(); 
