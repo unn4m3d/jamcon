@@ -1,4 +1,4 @@
-#define VERSION "0.1.0"
+#define VERSION "0.1.1"
 
 #include <SD.h>
 #include <Time.h>
@@ -155,23 +155,35 @@ void setup()
     5,
     BLACK
   );
+  display.setCursor(0,0);
+  display.print("I2C Init");
   display.fillRect(0,LCDHEIGHT-10,10,9,BLACK);
   display.display();           
   Wire.begin();                 // Инициализация I2C (на ней RTC и барометр)
   delay(250);                  // Ждем инициализации + 900 мс для отображения лого
+  display.setCursor(0,0);
+  display.fillRect(0,0,LCDWIDTH,8,WHITE);
+  display.print("Initializing");
   display.fillRect(0,LCDHEIGHT-10,40,9,BLACK);
   display.display(); 
   delay(250);
   display.fillRect(0,LCDHEIGHT-10,60,9,BLACK);
+  display.setCursor(0,0);
+  display.fillRect(0,0,LCDWIDTH,8,WHITE);
+  display.print("GY-68 Init");
   display.display(); 
   delay(250);           
   dps.begin();                  // Инициализация барометра и термометра
   loadSettings();
   setSyncProvider(RTC.get);     // Устанавливаем RTC как источник времени
   display.fillRect(0,LCDHEIGHT-10,80,9,BLACK);
+  display.setCursor(0,0);
+  display.fillRect(0,0,LCDWIDTH,8,WHITE);
+  display.print("SDCard Init");
   display.display(); 
   delay(250);    
   pinMode(53,OUTPUT);
+  digitalWrite(RELAY_PIN,HIGH);
   pinMode(RELAY_PIN,OUTPUT);
 
   if(sdCardPresent = SD.begin(46))
@@ -286,11 +298,11 @@ void drawMainScreen()
 
   SOUND
   {
-    sn_icon.draw(&display, WHITE, BLACK, LCDWIDTH-8,8,8,8);
+    sn_icon.draw(&display, WHITE, BLACK, LCDWIDTH-8,9,8,8);
   }
   else
   {
-    ns_icon.draw(&display, WHITE, BLACK, LCDWIDTH-8,8,8,8);
+    ns_icon.draw(&display, WHITE, BLACK, LCDWIDTH-8,9,8,8);
   }
 
   if(keyPressed('A'))
@@ -411,8 +423,8 @@ void drawGraph()
         {
           p += 0.3;
           progress((int)p,"Parsing");
-          graph[i][0] = LCDHEIGHT-(int)((gdata[i][0]-pmn)/pscale);
-          graph[i][1] = LCDHEIGHT-(int)((gdata[i][1]-tmn)/tscale);
+          graph[i][0] = LCDHEIGHT-(int)((float)(gdata[i][0]-pmn)/pscale);
+          graph[i][1] = LCDHEIGHT-(int)((float)(gdata[i][1]-tmn)/tscale);
         }
 
         progress(100,"Parsing");
