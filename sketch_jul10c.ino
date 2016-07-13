@@ -524,7 +524,7 @@ void drawSettings()
     sndchk(!settings.mute,&sn_icon,&ns_icon),
     pfchk(settings.pressureFormat,&mmhg,&pas);
 
-  static byte edit = 0;
+  static signed char edit = 0;
 
   eh_ed.setActive(edit == 3);
   mh_ed.setActive(edit == 1);
