@@ -28,7 +28,6 @@ TODO
 --
 
 1. Adafruit_BMP085_Library
-2. Adafruit_BMP085_Unified
 3. Adafruit_GFX_Library
 4. Adafruit_PCD8544_Nokia_5110_LCD_library
 5. Adafruit_Unified_Sensor
