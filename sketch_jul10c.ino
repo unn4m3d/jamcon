@@ -39,6 +39,11 @@ SBText a_icon = SBText("A");
 SBText st_icon = SBText("S");
 SBText n_icon = SBText(">");
 SBText p_icon = SBText("<");
+SBText pressure_icon("P"); //TODO Icons
+SBText temp_icon("T");
+
+SButton press_btn(BLACK,WHITE,&pressure_icon);
+SButton temp_btn(BLACK,WHITE,&temp_icon);
 
 
 // Создаем кнопки
@@ -148,11 +153,11 @@ void setup()
   display.setTextSize(1);       // Устанавливаем размер текста
   display.clearDisplay();       // Очищаем дисплей
   display.drawBitmap(           // Рисуем лого
-    LCDWIDTH/2-10,
-    LCDHEIGHT/2-5,
+    LCDWIDTH/2-(logo_width*4),
+    LCDHEIGHT/2-(logo_height/2),
     logo,
-    24,
-    5,
+    logo_width*8,
+    logo_height,
     BLACK
   );
   display.setCursor(0,0);
@@ -349,6 +354,8 @@ void progress(int percentage, String label)
   display.print(label + " ");
   display.print(percentage);
   display.print("%");
+  display.drawRect(0,10,LCDWIDTH,5,BLACK);
+  display.fillRect(0,11,LCDWIDTH*percentage/100, 3, BLACK);
   display.display();
 }
 
@@ -375,7 +382,7 @@ void drawGraph()
         while(stats.available())
         {
           pushToSR<String,74>(lines,stats.readStringUntil('\n'));
-          progress(stats.position()/stats.size(),"Reading");
+          progress(100*stats.position()/stats.size(),"Reading");
         }
         stats.close();
         float p = 0;
@@ -406,25 +413,24 @@ void drawGraph()
 
           if(gdata[i][0] != 0)
           {
-            if(gdata[i][0] > pmx) pmx = gdata[i][0];
-            if(gdata[i][0] < pmn) pmn = gdata[i][0];
+            pmx = max(pmx,gdata[i][0]);
+            pmn = min(pmn,gdata[i][0]);
           }
 
           if(gdata[i][1] != 0)
           {
-            if(gdata[i][1] > tmx) tmx = gdata[i][1];
-            if(gdata[i][1] < tmn) tmn = gdata[i][1];
+            tmx = max(tmx,gdata[i][1]);
+            tmn = min(tmn,gdata[i][1]);
           }
         }
-        float pscale = (48.0/(pmx-pmn));
-        float tscale = (48.0/(tmx-tmn));
 
         for(int i = 0; i < 74; i++)
         {
           p += 0.3;
           progress((int)p,"Parsing");
-          graph[i][0] = LCDHEIGHT-(int)((float)(gdata[i][0]-pmn)/pscale);
-          graph[i][1] = LCDHEIGHT-(int)((float)(gdata[i][1]-tmn)/tscale);
+          graph[i][0] = (byte)map((int)gdata[i][0],pmn,pmx,LCDHEIGHT,1);
+          sendResponse(String("G P ")+ i + String(" ") + graph[i][0]);
+          graph[i][1] = (byte)map((int)gdata[i][1],tmn,tmx,LCDHEIGHT,1);
         }
 
         progress(100,"Parsing");
@@ -469,17 +475,20 @@ void drawGraph()
     }
     else
     {
+      static byte choice = 0;
       display.clearDisplay();
-      SButton* btns[] = {&ok_btn,&cn_btn};
-      drawMenu(btns,2);
+      SButton* btns[] = {&ok_btn,&cn_btn,(choice ? &press_btn : &temp_btn) };
+      drawMenu(btns,3);
       for(int i = 0; i < 74; i++)
       {
-        if(graph[i][0] == 0 || graph[i][1] == 0)
+        if(graph[i][choice] == 0)
           break;
         //sendResponse(String(graph[i][0]));
         //sendResponse(String(graph[i][1]));
-        display.drawPixel(10+i,min(graph[i][0],47),BLACK);
-        display.drawPixel(10+i,min(graph[i][1],47),BLACK);
+        if(i != 0)
+        {
+          display.drawLine(i+9,graph[i-1][choice],i+10,graph[i][choice],BLACK);
+        }
       }
       display.display();
 
@@ -491,6 +500,10 @@ void drawGraph()
       {
         currentScreen = Main;
         graphLoaded = false;
+      }
+      else if(keyPressed('C'))
+      {
+        choice = (choice ? 0 : 1);
       }
     }
   }
