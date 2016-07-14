@@ -318,7 +318,7 @@ void drawMainScreen()
 }
 
 bool graphLoaded = false, graphError = true;
-byte graph[74][2];
+byte graph[LCDWIDTH-10][2];
 
 template<typename T, int N> void pushToSR(T arr[N], T value)
 {
@@ -358,25 +358,25 @@ void drawGraph()
 
     if(sdCardPresent)
     {
-      String lines[74];
+      String lines[LCDWIDTH-10];
       File stats = SD.open("BMPS.CSV",FILE_READ);
       if(stats)
       {
-        for(int i = 0; i < 74 && stats.available(); i++)
+        for(int i = 0; i < LCDWIDTH-10 && stats.available(); i++)
         {
           lines[i] = stats.readStringUntil('\n');
           progress(100*stats.position()/stats.size(),"Reading");
         }
         while(stats.available())
         {
-          pushToSR<String,74>(lines,stats.readStringUntil('\n'));
+          pushToSR<String,LCDWIDTH-10>(lines,stats.readStringUntil('\n'));
           progress(100*stats.position()/stats.size(),"Reading");
         }
         stats.close();
         float p = 0;
         progress((int)p,"Parsing");
-        float gdata[74][2];
-        for(int i = 0; i < 74; i++)
+        float gdata[LCDWIDTH-10][2];
+        for(int i = 0; i < LCDWIDTH-10; i++)
         {
           if(lines[i] == 0) continue;
           p += 0.3;
@@ -394,7 +394,7 @@ void drawGraph()
         float pmx=gdata[0][0],pmn=gdata[0][0];
         float tmx=gdata[0][1],tmn=gdata[0][1];
 
-        for(int i = 0; i < 74; i++)
+        for(int i = 0; i < LCDWIDTH-10; i++)
         {
           p += 0.5;
           progress((int)p,"Parsing");
@@ -412,7 +412,7 @@ void drawGraph()
           }
         }
 
-        for(int i = 0; i < 74; i++)
+        for(int i = 0; i < LCDWIDTH-10; i++)
         {
           p += 0.3;
           progress((int)p,"Parsing");
@@ -466,7 +466,7 @@ void drawGraph()
       display.clearDisplay();
       SButton* btns[] = {&ok_btn,&cn_btn,(choice ? &press_btn : &temp_btn) };
       drawMenu(btns,3);
-      for(int i = 1; i < 74; i++)
+      for(int i = 1; i < LCDWIDTH-10; i++)
       {
         if(graph[i][choice] == 0)
           break;
