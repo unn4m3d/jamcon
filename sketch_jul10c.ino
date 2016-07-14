@@ -403,8 +403,8 @@ void drawGraph()
         {
           p += 0.3;
           progress((int)p,"Parsing");
-          graph[i][0] = (byte)map((int)gdata[i][0],pmn,pmx,LCDHEIGHT,1);
-          graph[i][1] = (byte)map((int)gdata[i][1],tmn,tmx,LCDHEIGHT,1);
+          graph[i][0] = (byte)map((int)gdata[i][0],pmn,pmx,GRAPH_LOWER,GRAPH_UPPER);
+          graph[i][1] = (byte)map((int)gdata[i][1],tmn,tmx,GRAPH_LOWER,GRAPH_UPPER);
         }
 
         progress(100,"Parsing");
@@ -459,7 +459,13 @@ void drawGraph()
           break;
         //sendResponse(String(graph[i][0]));
         //sendResponse(String(graph[i][1]));
-        display.drawLine(i+9,graph[i-1][choice]-1,i+10,graph[i][choice]-1,BLACK);
+        display.drawLine(
+          i+9,
+          min(graph[i-1][choice]-1,LCDHEIGHT-1),
+          i+10,
+          min(graph[i][choice]-1,LCDHEIGHT-1),
+          BLACK
+        );
       }
       display.display();
 

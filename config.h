@@ -28,4 +28,8 @@
 #define RELAY_PIN       36
 /* Закомментируйте, если хотите использовать буквы T и P вместо иконок температуры и давления */
 #define USE_P_T_BITMAPS
+/* Верхняя граница графика */
+#define GRAPH_UPPER     5
+/* Нижняя граница графика */
+#define GRAPH_LOWER     LCDHEIGHT-5
 #endif
