@@ -1,7 +1,7 @@
 #ifndef __BITMAPS_H
 #define __BITMAPS_H
 
-#define BITMAP const PROGMEM static unsigned char 
+#include "bitmap.h"
 
 BITMAP logo[] = { //Битмап с логотипом
   B11111111,B11111100,B00000000,B00000000,
@@ -114,20 +114,45 @@ BITMAP nosnd_bmp[] = {
   B10000111
 };
 
-SBBitmap<8,8> gr_icon = SBBitmap<8,8>(gr_bmp);
-SBBitmap<7,7> sun_icon = SBBitmap<7,7>(sun_bmp);
-SBBitmap<8,8> moon_icon = SBBitmap<8,8>(moon_bmp);
-SBBitmap<8,8> ok_icon = SBBitmap<8,8>(ok_bmp);
-SBBitmap<8,8> cn_icon = SBBitmap<8,8>(cn_bmp);
-SBBitmap<8,8> s_icon = SBBitmap<8,8>(s_bmp);
+BITMAP play_bmp[] = {
+  B11000000,
+  B11110000,
+  B11111100,
+  B11111111,
+  B11111111,
+  B11111100,
+  B11110000,
+  B11000000
+};
 
-SBBitmap<8,8> sn_icon = SBBitmap<8,8>(snd_bmp);
-SBBitmap<8,8> ns_icon = SBBitmap<8,8>(nosnd_bmp);
+BITMAP pause_bmp[] = {
+  B01100110,
+  B01100110,
+  B01100110,
+  B01100110,
+  B01100110,
+  B01100110,
+  B01100110,
+  B01100110,
+};
 
-SBText a_icon = SBText("A");
-SBText st_icon = SBText("S");
-SBText n_icon = SBText(">");
-SBText p_icon = SBText("<");
+SBBitmap<8,8> gr_icon(gr_bmp);
+SBBitmap<7,7> sun_icon(sun_bmp);
+SBBitmap<8,8> moon_icon(moon_bmp);
+SBBitmap<8,8> ok_icon(ok_bmp);
+SBBitmap<8,8> cn_icon(cn_bmp);
+SBBitmap<8,8> s_icon(s_bmp);
+
+SBBitmap<8,8> sn_icon(snd_bmp);
+SBBitmap<8,8> ns_icon(nosnd_bmp);
+
+SBBitmap<8,8> play_icon(play_bmp);
+SBBitmap<8,8> pause_icon(pause_bmp);
+
+SBText a_icon("A");
+SBText st_icon("S");
+SBText n_icon(">");
+SBText p_icon("<");
 #ifdef USE_P_T_BITMAPS
   BITMAP temp_bmp[] = {
     B01111000,

@@ -1,5 +1,7 @@
 #ifndef __SBUTTON_H
 #define __SBUTTON_H
+#include "bitmap.h"
+
 class SBContent
 {
 public:
@@ -78,12 +80,12 @@ public:
     return bw;
   }
 
-  SBBitmap(const unsigned char b[bw*bh/8])
+  SBBitmap(const bitmap_t b[bw*bh/8])
   {
     bitmap = b;
   }
 private:
-  unsigned char const *bitmap;
+  bitmap_t const *bitmap;
 
 };
 
@@ -111,6 +113,12 @@ public:
   {
     this->bg = bg;
     this->fg = fg;
+    this->content = c;
+  }
+
+  SButton(SBContent *c){
+    this->bg = WHITE;
+    this->fg = BLACK;
     this->content = c;
   }
   

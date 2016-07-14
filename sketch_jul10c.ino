@@ -17,62 +17,11 @@
 #include "SEditable.h"
 #include "bitmaps.h"
 #include "SBool.h"
+#include "buttons.h"
 
 Adafruit_PCD8544 display = Adafruit_PCD8544(DISP_PINS); // Инициализируем дисплей
 Adafruit_BMP085 dps = Adafruit_BMP085(); // Объявляем барометр
 float t = 0, p = 0;
-
-SButton press_btn(BLACK,WHITE,&pressure_icon);
-SButton temp_btn(BLACK,WHITE,&temp_icon);
-
-
-// Создаем кнопки
-SButton s_btn = SButton(
-  BLACK,
-  WHITE,
-  &s_icon
-);
-
-
-SButton a_btn = SButton(
-  BLACK,
-  WHITE,
-  &a_icon
-);
-
-SButton st_btn = SButton(
-  BLACK,
-  WHITE,
-  &st_icon
-);
-
-SButton p_btn = SButton(
-  BLACK,
-  WHITE,
-  &p_icon
-);
-
-SButton n_btn = SButton(
-  BLACK,
-  WHITE,
-  &n_icon
-);
-
-SButton ok_btn = SButton(
-  BLACK,
-  WHITE,
-  &ok_icon
-);
-
-SButton cn_btn = SButton(
-  BLACK,
-  WHITE,
-  &cn_icon
-);
-
-SButton gr_btn = SButton(BLACK,WHITE,&gr_icon);
-
-
 
 char keymap[KEYPAD_ROWS][KEYPAD_COLS]=  // Карта клавиш
 {
@@ -305,7 +254,8 @@ void drawMainScreen()
 }
 
 bool graphLoaded = false, graphError = true;
-byte graph[LCDWIDTH-10][2];
+byte graph[2][LCDWIDTH-10];
+float graphMin[2],graphMax[2];
 
 template<typename T, int N> void pushToSR(T arr[N], T value)
 {
@@ -403,10 +353,14 @@ void drawGraph()
         {
           p += 0.3;
           progress((int)p,"Parsing");
-          graph[i][0] = (byte)map((int)gdata[i][0],pmn,pmx,GRAPH_LOWER,GRAPH_UPPER);
-          graph[i][1] = (byte)map((int)gdata[i][1],tmn,tmx,GRAPH_LOWER,GRAPH_UPPER);
+          graph[0][i] = (byte)map((int)gdata[i][0],pmn,pmx,GRAPH_LOWER,GRAPH_UPPER);
+          graph[1][i] = (byte)map((int)gdata[i][1],tmn,tmx,GRAPH_LOWER,GRAPH_UPPER);
         }
-
+        graphMin[0] = pmn;
+        graphMin[1] = tmn;
+        graphMax[0] = tmn;
+        graphMax[1] = tmx;
+       
         progress(100,"Parsing");
         delay(250);
 
@@ -449,25 +403,33 @@ void drawGraph()
     }
     else
     {
-      static byte choice = 0;
+      static byte choice = 0, frame = 0;
+      static bool realtime = false;
+      frame++;
+      frame%=8;
       display.clearDisplay();
-      SButton* btns[] = {&ok_btn,&cn_btn,(choice ? &press_btn : &temp_btn) };
-      drawMenu(btns,3);
+      SButton* btns[] = {&ok_btn,&cn_btn,(choice ? &press_btn : &temp_btn),(realtime ? &pause_btn : &play_btn)};
+      drawMenu(btns,4);
       for(int i = 1; i < LCDWIDTH-10; i++)
       {
-        if(graph[i][choice] == 0)
+        if(graph[choice][i] == 0)
           break;
         //sendResponse(String(graph[i][0]));
         //sendResponse(String(graph[i][1]));
         display.drawLine(
           i+9,
-          min(graph[i-1][choice]-1,LCDHEIGHT-1),
+          min(graph[choice][i-1]-1,LCDHEIGHT-1),
           i+10,
-          min(graph[i][choice]-1,LCDHEIGHT-1),
+          min(graph[choice][i]-1,LCDHEIGHT-1),
           BLACK
         );
       }
       display.display();
+      if(realtime && frame==0)
+      {
+        pushToRTGraph(0,dps.readPressure());
+        pushToRTGraph(1,dps.readTemperature());
+      }
 
       if(keyPressed('A'))
       {
@@ -482,8 +444,33 @@ void drawGraph()
       {
         choice = (choice ? 0 : 1);
       }
+      else if(keyPressed('D'))
+      {
+        realtime = !realtime;
+      }
     }
   }
+}
+
+void pushToRTGraph(int selector, float value)
+{
+  if(value > graphMax[selector])
+  {
+    for(int i = 1; i < LCDWIDTH-10; i++)
+    {
+      graph[selector][i] = (byte)(graph[selector][i]/((value-graphMin[selector])/(graphMax[selector]-graphMin[selector])));
+    }
+    graphMax[selector] = value;
+  }
+  else if(value < graphMin[selector])
+  {
+    for(int i = 1; i < LCDWIDTH-10; i++)
+    {
+      graph[selector][i] = (byte)(graph[selector][i]/((graphMax[selector]-value)/(graphMax[selector]-graphMin[selector])));
+    }
+    graphMin[selector] = value;
+  }
+  pushToSR<byte,LCDWIDTH-10>(graph[selector],(byte)map(value,graphMin[selector],graphMax[selector],GRAPH_LOWER,GRAPH_UPPER));
 }
 
 void drawAboutScreen()
