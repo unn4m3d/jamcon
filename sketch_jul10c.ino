@@ -1,5 +1,3 @@
-#define VERSION "0.1.1"
-
 #include <SD.h>
 #include <Time.h>
 #include <DS1307RTC.h>
@@ -10,6 +8,7 @@
 #include <gfxfont.h>
 #include <Key.h>
 #include <Keypad.h>
+#include "config.h"
 #include "notes.h"
 #include "SButton.h"
 #include "settings.h"
@@ -18,17 +17,6 @@
 #include "SEditable.h"
 #include "bitmaps.h"
 #include "SBool.h"
-
-#define LOAD_LED_PIN    48
-#define ERR_LED_PIN     47
-#define DISP_PINS       30,31,32,33,34
-#define SDCARD_SS_PIN   46
-#define KEYPAD_R_PINS   22,23,24,25
-#define KEYPAD_C_PINS   26,27,28,29
-#define KEYPAD_ROWS     4
-#define KEYPAD_COLS     4
-#define BUZZER_PIN      35
-#define RELAY_PIN       36
 
 Adafruit_PCD8544 display = Adafruit_PCD8544(DISP_PINS); // Инициализируем дисплей
 Adafruit_BMP085 dps = Adafruit_BMP085(); // Объявляем барометр
@@ -429,7 +417,6 @@ void drawGraph()
           p += 0.3;
           progress((int)p,"Parsing");
           graph[i][0] = (byte)map((int)gdata[i][0],pmn,pmx,LCDHEIGHT,1);
-          sendResponse(String("G P ")+ i + String(" ") + graph[i][0]);
           graph[i][1] = (byte)map((int)gdata[i][1],tmn,tmx,LCDHEIGHT,1);
         }
 
@@ -479,16 +466,13 @@ void drawGraph()
       display.clearDisplay();
       SButton* btns[] = {&ok_btn,&cn_btn,(choice ? &press_btn : &temp_btn) };
       drawMenu(btns,3);
-      for(int i = 0; i < 74; i++)
+      for(int i = 1; i < 74; i++)
       {
         if(graph[i][choice] == 0)
           break;
         //sendResponse(String(graph[i][0]));
         //sendResponse(String(graph[i][1]));
-        if(i != 0)
-        {
-          display.drawLine(i+9,graph[i-1][choice],i+10,graph[i][choice],BLACK);
-        }
+        display.drawLine(i+9,graph[i-1][choice]-1,i+10,graph[i][choice]-1,BLACK);
       }
       display.display();
 
