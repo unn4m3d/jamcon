@@ -87,21 +87,21 @@ void setup()
   display.setCursor(0,0);
   display.print("I2C Init");
   display.fillRect(0,LCDHEIGHT-10,10,9,BLACK);
-  display.display();           
+  display.display();
   Wire.begin();                 // Инициализация I2C (на ней RTC и барометр)
   delay(250);                  // Ждем инициализации + 900 мс для отображения лого
   display.setCursor(0,0);
   display.fillRect(0,0,LCDWIDTH,8,WHITE);
   display.print("Initializing");
   display.fillRect(0,LCDHEIGHT-10,40,9,BLACK);
-  display.display(); 
+  display.display();
   delay(250);
   display.fillRect(0,LCDHEIGHT-10,60,9,BLACK);
   display.setCursor(0,0);
   display.fillRect(0,0,LCDWIDTH,8,WHITE);
   display.print("GY-68 Init");
-  display.display(); 
-  delay(250);           
+  display.display();
+  delay(250);
   dps.begin();                  // Инициализация барометра и термометра
   loadSettings();
   setSyncProvider(RTC.get);     // Устанавливаем RTC как источник времени
@@ -109,8 +109,8 @@ void setup()
   display.setCursor(0,0);
   display.fillRect(0,0,LCDWIDTH,8,WHITE);
   display.print("SDCard Init");
-  display.display(); 
-  delay(250);    
+  display.display();
+  delay(250);
   pinMode(53,OUTPUT);
   digitalWrite(RELAY_PIN,HIGH);
   pinMode(RELAY_PIN,OUTPUT);
@@ -120,7 +120,7 @@ void setup()
   else
     sendResponse("SDCard failed to initialize");
   display.fillRect(0,LCDHEIGHT-10,84,9,BLACK);
-  display.display();    
+  display.display();
 }
 
 char menuButtons[] = {'A','B','C','D'}; // Кнопки меню
@@ -128,7 +128,7 @@ char menuButtons[] = {'A','B','C','D'}; // Кнопки меню
 void drawMenu(SButton** buttons, byte count)
 {
 
-  
+
   if(count > 4) count = 4;
   display.fillRect(0,0,9,LCDHEIGHT,BLACK);
 
@@ -147,7 +147,7 @@ void drawMenu(SButton** buttons, byte count)
     }
     buttons[i]->draw(&display,0,LCDHEIGHT/4*i + 1, 9, LCDHEIGHT/4 - 2);
   }
-  
+
   display.drawFastHLine(0,LCDHEIGHT/4,9,WHITE);
   display.drawFastHLine(0,LCDHEIGHT*2/4,9,WHITE);
   display.drawFastHLine(0,LCDHEIGHT*3/4,9,WHITE);
@@ -185,7 +185,7 @@ enum InfoScreen{Main,Graph,Settings,Stats,About};
 InfoScreen currentScreen = Main;
 
 void drawMainScreen()
-{ 
+{
   p = dps.readPressure();
   t = dps.readTemperature();
 
@@ -201,7 +201,7 @@ void drawMainScreen()
   display.print(padLeft(String(hour()),2) + ":" + padLeft(String(minute()),2) + ":" + padLeft(String(second()),2));
 
   display.setTextColor(BLACK);
-    
+
   display.setCursor(10, 0);
   display.print(String(t) + " C");
 
@@ -284,6 +284,32 @@ void progress(int percentage, String label)
   display.display();
 }
 
+void pushToRTGraph(int selector, float value)
+{
+  sendResponse(String("Pushing ") + value + " to " + selector);
+  if(value > graphMax[selector])
+  {
+    sendResponse("Value is higher than max");
+    for(int i = 1; i < LCDWIDTH-10; i++)
+    {
+      graph[selector][i] = (byte)(graph[selector][i]/((value-graphMin[selector])/(graphMax[selector]-graphMin[selector])));
+      sendResponse(String("#") + i + " is " + graph[selector][i]);
+    }
+    graphMax[selector] = value;
+  }
+  else if(value < graphMin[selector])
+  {
+    sendResponse("Value is lower than min");
+    for(int i = 1; i < LCDWIDTH-10; i++)
+    {
+      graph[selector][i] = (byte)(graph[selector][i]/((graphMax[selector]-value)/(graphMax[selector]-graphMin[selector])));
+      sendResponse(String("#") + i + " is " + graph[selector][i]);
+    }
+    graphMin[selector] = value;
+  }
+  pushToSR<byte,LCDWIDTH-10>(graph[selector],(byte)map(value,graphMin[selector],graphMax[selector],GRAPH_LOWER,GRAPH_UPPER));
+}
+
 void drawGraph()
 {
   if(!graphLoaded)
@@ -291,7 +317,7 @@ void drawGraph()
     display.clearDisplay();
     display.setCursor(0,0);
     display.print("Loading...");
-    display.display(); 
+    display.display();
 
     if(sdCardPresent)
     {
@@ -360,13 +386,13 @@ void drawGraph()
         graphMin[1] = tmn;
         graphMax[0] = tmn;
         graphMax[1] = tmx;
-       
+
         progress(100,"Parsing");
         delay(250);
 
         graphLoaded = true;
         graphError = false;
-        
+
       }
       else
       {
@@ -382,7 +408,7 @@ void drawGraph()
       graphLoaded = true;
       graphError = true;
     }
-    
+
   }
   else
   {
@@ -450,27 +476,6 @@ void drawGraph()
       }
     }
   }
-}
-
-void pushToRTGraph(int selector, float value)
-{
-  if(value > graphMax[selector])
-  {
-    for(int i = 1; i < LCDWIDTH-10; i++)
-    {
-      graph[selector][i] = (byte)(graph[selector][i]/((value-graphMin[selector])/(graphMax[selector]-graphMin[selector])));
-    }
-    graphMax[selector] = value;
-  }
-  else if(value < graphMin[selector])
-  {
-    for(int i = 1; i < LCDWIDTH-10; i++)
-    {
-      graph[selector][i] = (byte)(graph[selector][i]/((graphMax[selector]-value)/(graphMax[selector]-graphMin[selector])));
-    }
-    graphMin[selector] = value;
-  }
-  pushToSR<byte,LCDWIDTH-10>(graph[selector],(byte)map(value,graphMin[selector],graphMax[selector],GRAPH_LOWER,GRAPH_UPPER));
 }
 
 void drawAboutScreen()
@@ -608,11 +613,11 @@ void drawSettings()
           if(em_ed.getValue() > 10)
             edit++;
           break;
-          
+
         case 5:
           edit++;
           break;
-          
+
         case 6:
           edit = 0;
           break;
@@ -635,7 +640,7 @@ void loop()
     switch(command[0])
     {
       case 'T':
-        // TODO : Сделать настройку времени с клавиатуры 
+        // TODO : Сделать настройку времени с клавиатуры
         te.Second = command.substring(16, 18).toInt();
         te.Minute = command.substring(13, 15).toInt();
         te.Hour = command.substring(10, 12).toInt();
@@ -755,5 +760,3 @@ void loop()
   }
   delay(250);
 }
-
-
