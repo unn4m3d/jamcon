@@ -687,15 +687,21 @@ void loop()
         stats = SD.open("BMPS.CSV",FILE_READ);
         if(stats)
         {
-          Serial.print(RES_BYTE);
           while(stats.available())
-            Serial.write(stats.read());
+          {
+            progress(100*stats.position()/stats.size(),"Sending");
+            sendResponse(String("SL ")+stats.readStringUntil('\n'));
+          }
           stats.close();
         }
         else
         {
-          sendResponse("IO ERROR");
+          sendResponse("EL IO ERROR");
         }
+        break;
+      case 'D':
+        sendResponse(String("SP ") + dps.readPressure());
+        sendResponse(String("ST ") + dps.readTemperature());
         break;
     }
   }
