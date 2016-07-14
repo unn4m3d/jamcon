@@ -1,7 +1,9 @@
 #ifndef __BITMAPS_H
 #define __BITMAPS_H
 
-const static unsigned char logo[] PROGMEM = { //Битмап с логотипом
+#define BITMAP const PROGMEM static unsigned char 
+
+BITMAP logo[] = { //Битмап с логотипом
   B11111111,B11111100,B00000000,B00000000,
   B11111111,B11111100,B00000000,B00000000,
   B11111111,B11111100,B00000000,B00000000,
@@ -23,7 +25,7 @@ const static int logo_width = 4;
 const static int logo_height = 15;
 
 // Битмап для кнопки настроек
-static unsigned char s_bmp[] = {
+BITMAP s_bmp[] = {
   B00100100,
   B00111100,
   B11111111,
@@ -34,20 +36,8 @@ static unsigned char s_bmp[] = {
   B00100100
 };
 
-// Битмап для кнопки настроек времени
-static unsigned char c_bmp[] = {
-  B00111100,
-  B01000010,
-  B11100001,
-  B10111001,
-  B10011001,
-  B10010001,
-  B01100010,
-  B00111100
-};
-
 // Битмап для кнопки OK
-static unsigned char ok_bmp[] = {
+BITMAP ok_bmp[] = {
   B00000011,
   B00000011,
   B00000110,
@@ -59,7 +49,7 @@ static unsigned char ok_bmp[] = {
 };
 
 // Битмап для кнопки отмены
-static unsigned char cn_bmp[] = {
+BITMAP cn_bmp[] = {
   B11000011,
   B11100111,
   B01111110,
@@ -70,7 +60,7 @@ static unsigned char cn_bmp[] = {
   B11000011
 };
 
-static unsigned char gr_bmp[] = {
+BITMAP gr_bmp[] = {
   B10000000,
   B10000000,
   B10000000,
@@ -81,7 +71,7 @@ static unsigned char gr_bmp[] = {
   B11111111
 };
 
-static unsigned char sun_bmp[] = {
+BITMAP sun_bmp[] = {
   B00010000,
   B01010100,
   B00111000,
@@ -91,7 +81,7 @@ static unsigned char sun_bmp[] = {
   B00010000
 };
 
-static unsigned char moon_bmp[] = {
+BITMAP moon_bmp[] = {
   B11111111,
   B11000011,
   B10111101,
@@ -102,7 +92,7 @@ static unsigned char moon_bmp[] = {
   B11111111
 };
 
-static unsigned char snd_bmp[] = {
+BITMAP snd_bmp[] = {
   B00000110,
   B00001010,
   B01110010,
@@ -113,7 +103,7 @@ static unsigned char snd_bmp[] = {
   B00000110
 };
 
-static unsigned char nosnd_bmp[] = {
+BITMAP nosnd_bmp[] = {
   B10000111,
   B01001110,
   B01110110,
@@ -130,9 +120,43 @@ SBBitmap<8,8> moon_icon = SBBitmap<8,8>(moon_bmp);
 SBBitmap<8,8> ok_icon = SBBitmap<8,8>(ok_bmp);
 SBBitmap<8,8> cn_icon = SBBitmap<8,8>(cn_bmp);
 SBBitmap<8,8> s_icon = SBBitmap<8,8>(s_bmp);
-SBBitmap<8,8> c_icon = SBBitmap<8,8>(c_bmp);
 
 SBBitmap<8,8> sn_icon = SBBitmap<8,8>(snd_bmp);
 SBBitmap<8,8> ns_icon = SBBitmap<8,8>(nosnd_bmp);
 
+SBText a_icon = SBText("A");
+SBText st_icon = SBText("S");
+SBText n_icon = SBText(">");
+SBText p_icon = SBText("<");
+#ifdef USE_P_T_BITMAPS
+  BITMAP temp_bmp[] = {
+    B01111000,
+    B01010000,
+    B01011000,
+    B01010000,
+    B01010000,
+    B01010000,
+    B11111000,
+    B11111000,
+    B11111000
+  };
+
+  SBBitmap<5,9> temp_icon(temp_bmp);
+
+  BITMAP pressure_bmp[] = {
+    B00111100,
+    B01000010,
+    B11100001,
+    B10111001,
+    B10011001,
+    B10010001,
+    B01100010,
+    B00111100
+  };
+
+  SBBitmap<8,8> pressure_icon(pressure_bmp);
+#else
+  SBText pressure_icon("P"); //TODO Icons
+  SBText temp_icon("T");
+#endif // USE_P_T_BITMAPS
 #endif // __BITMAPS_H

@@ -26,5 +26,6 @@
 #define BUZZER_PIN      35
 /* Пин реле */
 #define RELAY_PIN       36
-
+/* Закомментируйте, если хотите использовать буквы T и P вместо иконок температуры и давления */
+#define USE_P_T_BITMAPS
 #endif

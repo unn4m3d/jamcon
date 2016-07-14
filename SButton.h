@@ -78,12 +78,12 @@ public:
     return bw;
   }
 
-  SBBitmap(unsigned char b[bw*bh/8])
+  SBBitmap(const unsigned char b[bw*bh/8])
   {
     bitmap = b;
   }
 private:
-  unsigned char *bitmap;
+  unsigned char const *bitmap;
 
 };
 

@@ -22,14 +22,6 @@ Adafruit_PCD8544 display = Adafruit_PCD8544(DISP_PINS); // Инициализи�
 Adafruit_BMP085 dps = Adafruit_BMP085(); // Объявляем барометр
 float t = 0, p = 0;
 
-// Создаем иконки (битмап или текст)
-SBText a_icon = SBText("A");
-SBText st_icon = SBText("S");
-SBText n_icon = SBText(">");
-SBText p_icon = SBText("<");
-SBText pressure_icon("P"); //TODO Icons
-SBText temp_icon("T");
-
 SButton press_btn(BLACK,WHITE,&pressure_icon);
 SButton temp_btn(BLACK,WHITE,&temp_icon);
 
@@ -41,11 +33,6 @@ SButton s_btn = SButton(
   &s_icon
 );
 
-SButton c_btn = SButton(
-  BLACK,
-  WHITE,
-  &c_icon
-);
 
 SButton a_btn = SButton(
   BLACK,
