@@ -1,6 +1,37 @@
 Just a monitoring microcontroller
 ==
 
+**ВАЖНО**! Скетч может быть несовместим с Arduino IDE, поэтому используется система сборки make и [arduino.mk](http://ed.am/dev/make/arduino-mk) (измененный в плане поиска заголовков и исходников)
+
+Как собрать и загрузить
+--
+
+Требования:
+- GNU Make или аналог
+- Arduino IDE 1.6 или выше
+
+Сборка (на Linux) :
+```sh
+#Сборка
+LIBRARYPATH=../путь/к/папке/libraries ARDUINODIR=путь/к/arduino/ide make
+#Загрузка
+ARDUINODIR=путь/к/arduino/ide SERIALDEV=/dev/ваше_устройство make upload
+```
+
+или так
+
+```sh
+export ARDUINODIR=путь/к/arduino/ide
+export BOARD=ваша_плата
+export LIBRARYPATH=../путь/к/libraries
+make
+SERIALDEV=/dev/ваше_устройство make upload
+```
+
+* `LIBRARYPATH` должен содержать путь с установленными библиотеками
+* Если ваша плата - не Arduino Mega 2560, то необходимо указать плату в переменной среды `BOARD`
+* Список доступных плат можно посмотреть командой `ARDUINODIR=путь/к/arduino/ide make boards`
+
 TODO
 --
 
@@ -19,7 +50,7 @@ TODO
 - Может строить графики по данным с SD-карты
 - Работает с 4x4 Keypad
 - Переключает реле в зависимости от "дневного" или "ночного" режимов
-- Время переключения настраивается 
+- Время переключения настраивается
 - Настройки сохраняются в EEPROM
 - Может пищать при нажатии кнопок (настраивается)
 - Меню на 4 кнопки (A,B,C,D) слева экрана
@@ -73,4 +104,3 @@ Hardware
 	- IN -> D36
 	- VCC -> 5V
 	- GND -> GND
-
